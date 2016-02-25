@@ -10,8 +10,6 @@ void regSet()
 {
     *((volatile uint32_t*)0x1FFFFFFC) = 0;
     volatile uint32_t *entry = (uint32_t *)0x1FFFFFF8;
-   
-    *(volatile uint32_t*) 0x20000000 = 1;
     
     // pdn sub_101D98
     *((volatile uint32_t*)0x10141200) = 0x10000; // PDN_GPU_CNT
