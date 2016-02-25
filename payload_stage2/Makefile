@@ -40,7 +40,7 @@ CFLAGS	+=	$(INCLUDE)
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
-ASFLAGS	:=	-g $(ARCH) 
+ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-nostartfiles -g $(ARCH) -Wl,-Map,$(TARGET).map
 
 LDFLAGS += --specs=../../common/payload_stage2.specs
@@ -111,7 +111,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(DATA) $(BUILD) $(OUTPUT).bin
+	@rm -fr $(DATA) $(BUILD) $(OUTPUT).elf $(OUTPUT).bin
 
 #---------------------------------------------------------------------------------
 else
