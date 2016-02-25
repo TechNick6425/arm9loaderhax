@@ -12,7 +12,6 @@ extern u32 screen_init_bin_size;
 
 void ownArm11()
 {
-	//*(volatile uint32_t *)0x1FFFFFF8 = 0xABADBABE;
         memcpy((void*)0x1FFF4C80, screen_init_bin, screen_init_bin_size);
 	*((u32*)0x1FFAED80) = 0xE51FF004;
 	*((u32*)0x1FFAED84) = 0x1FFF4C80;
@@ -21,7 +20,7 @@ void ownArm11()
 		*((u8*)0x1FFFFFF0) = 2;
 	}
 	for(volatile unsigned int i = 0; i < 0xF; ++i);
-	while(*(volatile uint32_t *)0x20000000 != 0);
+	while(*(volatile uint32_t *)0x1FFFFFF8 != 0);
 }
 
 int main()
@@ -51,7 +50,7 @@ int main()
 		{
 			f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
 			ownArm11();
-                        entry();
+                        screenInit();
 			((void (*)())PAYLOAD_ADDRESS)();
 		}
 	}
