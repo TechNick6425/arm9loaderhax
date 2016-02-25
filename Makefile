@@ -37,12 +37,16 @@ stage2:
 	@cp payload_stage2/payload_stage2.bin $(OUTDIR)/stage0x5C000.bin
 
 installer:
-	@cd payload_installer && make
+	@cp $(OUTDIR)/sector.bin payload_installer/brahma2/data/sector.bin
+	@cp $(OUTDIR)/firm0.bin payload_installer/brahma2/data/firm0.bin
+	@cp $(OUTDIR)/firm1.bin payload_installer/brahma2/data/firm1.bin
+	@cp $(OUTDIR)/stage0x5C000.bin  payload_installer/brahma2/data/stage2.bin
+	@cd payload_installer && make TARGET=../$(OUTDIR)/$(TARGET)
 	@echo INSTALLER done!
 
 clean:
 	@echo clean...
-	@cd payload_stage1 && make clean
-	$(MAKE) -C screen_init clean
-	@cd payload_stage2 && make clean
-	@cd payload_installer && make clean TARGET=../$(TARGET)
+	@$(MAKE) -C payload_stage1 clean
+	@$(MAKE) -C screen_init clean
+	@$(MAKE) -C payload_stage2 clean
+	@$(MAKE) -C payload_installer clean TARGET=../$(TARGET)
