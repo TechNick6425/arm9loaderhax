@@ -7,6 +7,8 @@
 #define PAYLOAD_ADDRESS		0x23F00000
 #define PAYLOAD_SIZE		0x00100000
 
+#define HID_PAD            ((~*(u16*)0x10146000) & 0xFFF)
+
 extern u8 screen_init_bin[];
 extern u32 screen_init_bin_size;
 
@@ -46,27 +48,25 @@ int main()
 
 	if(f_mount(&fs, "0:", 0) == FR_OK)
 	{
-        if((*(volatile u32*)0x10146000) & 1)
+        char* payloadloc;
+
+        if(HID_PAD & 1)
         {
             // Load Decrypt9
-            if(f_open(&payload, "decrypt9.bin", FA_READ | FA_OPEN_EXISTING) == FR_OK)
-		    {
-			    f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
-			    ownArm11();
-                screenInit();
-			    ((void (*)())PAYLOAD_ADDRESS)();
-		    }
+            payloadloc = "decrypt9.bin";
         }
         else
         {
             // Load regular payload
-		    if(f_open(&payload, "arm9loaderhax.bin", FA_READ | FA_OPEN_EXISTING) == FR_OK)
-		    {
-			    f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
-			    ownArm11();
-                screenInit();
-			    ((void (*)())PAYLOAD_ADDRESS)();
-		    }
+		    payloadloc = "arm9loaderhax.bin";
+        }
+
+        if(f_open(&payload, payloadloc, FA_READ | FA_OPEN_EXISTING) == FR_OK)
+        {
+            f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
+            ownArm11();
+            screenInit();
+            ((void (*)())PAYLOAD_ADDRESS)();
         }
 	}
 
