@@ -13,8 +13,8 @@ extern u32 screen_init_bin_size;
 void ownArm11()
 {
     memcpy((void*)0x1FFF4C80, screen_init_bin, screen_init_bin_size);
-	*((u32*)0x1FFAED80) = 0xE51FF004;
-	*((u32*)0x1FFAED84) = 0x1FFF4C80;
+    *((u32*)0x1FFAED80) = 0xE51FF004;
+    *((u32*)0x1FFAED84) = 0x1FFF4C80;
 	for(int i = 0; i < 0x80000; i++)
 	{
 		*((u8*)0x1FFFFFF0) = 2;
