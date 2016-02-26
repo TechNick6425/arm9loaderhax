@@ -1,4 +1,5 @@
 #include "common.h"
+#include "decrypt9.h"
 #include "sdmmc.h"
 #include "i2c.h"
 #include "fatfs/ff.h"
@@ -12,7 +13,7 @@ extern u32 screen_init_bin_size;
 
 void ownArm11()
 {
-        memcpy((void*)0x1FFF4C80, screen_init_bin, screen_init_bin_size);
+    memcpy((void*)0x1FFF4C80, screen_init_bin, screen_init_bin_size);
 	*((u32*)0x1FFAED80) = 0xE51FF004;
 	*((u32*)0x1FFAED84) = 0x1FFF4C80;
 	for(int i = 0; i < 0x80000; i++)
@@ -43,18 +44,31 @@ int main()
 	FATFS fs;
 	FIL payload;
 	u32 br;
-	
+
 	if(f_mount(&fs, "0:", 0) == FR_OK)
 	{
-		if(f_open(&payload, "arm9loaderhax.bin", FA_READ | FA_OPEN_EXISTING) == FR_OK)
-		{
-			f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
-			ownArm11();
-                        screenInit();
-			((void (*)())PAYLOAD_ADDRESS)();
-		}
+        if((*(volatile u32*)0x10146000) & (1 << 9))
+        {
+            // Load Decrypt9
+            memcpy(PAYLOAD_ADDRESS, (u8*)Decrypt9[0], 119872);
+
+            ownArm11();
+            screenInit();
+            ((void (*)())PAYLOAD_ADDRESS)();
+        }
+        else
+        {
+            // Load regular payload
+		    if(f_open(&payload, "arm9loaderhax.bin", FA_READ | FA_OPEN_EXISTING) == FR_OK)
+		    {
+			    f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
+			    ownArm11();
+                screenInit();
+			    ((void (*)())PAYLOAD_ADDRESS)();
+		    }
+        }
 	}
-	
+
 	i2cWriteRegister(I2C_DEV_MCU, 0x20, (u8)(1<<0));
     return 0;
 }
