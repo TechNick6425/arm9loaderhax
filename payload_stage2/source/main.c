@@ -1,5 +1,4 @@
 #include "common.h"
-#include "decrypt9.h"
 #include "sdmmc.h"
 #include "i2c.h"
 #include "fatfs/ff.h"
@@ -47,14 +46,16 @@ int main()
 
 	if(f_mount(&fs, "0:", 0) == FR_OK)
 	{
-        if((*(volatile u32*)0x10146000) & (1 << 9))
+        if((*(volatile u32*)0x10146000) & 1)
         {
             // Load Decrypt9
-            memcpy(PAYLOAD_ADDRESS, (u8*)Decrypt9[0], 119872);
-
-            ownArm11();
-            screenInit();
-            ((void (*)())PAYLOAD_ADDRESS)();
+            if(f_open(&payload, "decrypt9.bin", FA_READ | FA_OPEN_EXISTING) == FR_OK)
+		    {
+			    f_read(&payload, PAYLOAD_ADDRESS, PAYLOAD_SIZE, &br);
+			    ownArm11();
+                screenInit();
+			    ((void (*)())PAYLOAD_ADDRESS)();
+		    }
         }
         else
         {
